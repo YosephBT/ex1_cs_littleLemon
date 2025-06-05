@@ -1,11 +1,11 @@
 import Nav from "./Nav";
-import Logo from "./img/logo.png";
+import Logo from "../assets/img/Logo.svg";
 const Header = () => {
   return (
-    <>
-      <img src="{Logo}" alt="Little Lemon Logo" />
+    <header>
+      <div className="logo"><img src={Logo} alt="Little Lemon Logo" /></div>
       <Nav />
-    </>
+    </header>
   );
 };
 
