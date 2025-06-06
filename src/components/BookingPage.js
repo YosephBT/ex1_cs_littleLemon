@@ -1,7 +1,7 @@
+import BookingForm from "../components/BookingForm";
 const BookingPage = () => {
   return (
-    <section>
-    </section>
+      <BookingForm />
   );
 };
 
