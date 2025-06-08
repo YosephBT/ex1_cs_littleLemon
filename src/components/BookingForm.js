@@ -1,36 +1,44 @@
-import { useState, useEffect } from "react";
+import { useState } from 'react';
+import { fetchAPI, submitAPI } from '../api/api';
+
+
 const BookingForm = (props) => {
   const [bookingData, setBookingData] = useState({
-    booking_date: "",
-    booking_time: "",
-    guests: 0,
-    occasion: "",
+    booking_date: '',
+    booking_time: '',
+    guests: 1,
+    occasion: '',
   });
-  useEffect(() => {
-    console.log(props);
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBookingData({ ...bookingData, [name]: value });
-    props.dispatch({ type: 'UPDATE_TIMES', payload: e.target.value });
-
+    const newValue = name === 'guests' ? parseInt(value) || 1 : value;
+    setBookingData({ ...bookingData, [name]: newValue });
+    if (name === 'booking_time') {
+      props.dispatch({ type: 'UPDATE_TIMES', payload: new Date().toISOString().split("T")[0] });
+    }
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
-    props.setATime(() => props.dispatch(bookingData));
-    console.log("Form submitted:", bookingData);
+    console.log('Form submitted:', bookingData);
+    props.setATime(bookingData.booking_time);
+    // props.dispatch({ type: 'SUBMIT_BOOKING', payload: bookingData });
+    submitAPI(bookingData);
     setBookingData({
-      booking_date: "",
-      booking_time: "",
-      guests: 0,
-      occasion: "",
+      booking_date: '',
+      booking_time: '',
+      guests: 1,
+      occasion: '',
     });
+    if (props.onSubmit) {
+      props.onSubmit(bookingData);
+    }
   };
 
   return (
     <>
+      <h2>Book Now</h2>
       <form onSubmit={submitHandler}>
         <div>
           <label htmlFor="booking_date">Booking Date:</label>
@@ -39,13 +47,20 @@ const BookingForm = (props) => {
             id="booking_date"
             onChange={handleChange}
             name="booking_date"
-            value={bookingData.bookingData}
+            value={bookingData.booking_date} 
             required
           />
         </div>
         <div>
           <label htmlFor="booking_time">Booking Time:</label>
-          <select name="booking_time" id="booking_time" onChange={handleChange}>
+          <select
+            name="booking_time"
+            id="booking_time"
+            onChange={handleChange}
+            value={bookingData.booking_time}
+            required
+          >
+            <option value="">Select a time</option>
             {props.availableTimes.map((time) => (
               <option key={time} value={time}>
                 {time}
@@ -68,24 +83,24 @@ const BookingForm = (props) => {
         </div>
         <div>
           <label htmlFor="occasion">Occasion:</label>
-          <select name="occasion" onChange={handleChange} id="occasion">
-            <option value=""> Select Occasion</option>
-            <option
-              selected={bookingData.occasion === "Birthday"}
-              value="Birthday"
-            >
-              Birthday
-            </option>
-            <option
-              selected={bookingData.occasion === "Anniversary"}
-              value="Anniversary"
-            >
-              Anniversary
-            </option>
+          <select
+            name="occasion"
+            onChange={handleChange}
+            id="occasion"
+            value={bookingData.occasion}
+            required
+          >
+            <option value="">Select Occasion</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Anniversary">Anniversary</option>
           </select>
         </div>
         <div>
-          <input type="submit" value="Make Your reservation" />
+          <input
+            data-testid="btnSubmit"
+            type="submit"
+            value="Make Your reservation"
+          />
         </div>
       </form>
     </>
